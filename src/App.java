@@ -10,8 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
-// Press Shift twice to open the Search Everywhere dialog and type `show whitespaces`,
-// then press Enter. You can now see whitespace characters in your code.
+
 public class App {
     public static  List<List<Integer>> deck = BlackJack.createDeck();
     public static List<List<List<Integer>>> pioched_deck =new ArrayList<>();
@@ -194,10 +193,12 @@ public class App {
             pioched_deck = BlackJack.piocheDeck(deck);
         }
         List<Integer> card = pioched_deck.get(0).remove(0);
+
         dealer_hand.add(card);
         dealer_points = BlackJack.getCardValueConform(dealer_hand);
         for(int i = 0; i < 2; i++){
             card = pioched_deck.get(0).remove(0);
+
             player_hand.add(card);
             player_points = BlackJack.getCardValueConform(player_hand);
 
@@ -214,6 +215,7 @@ public class App {
                 pioched_deck = BlackJack.piocheDeck(deck);
         }
             List<Integer> card = pioched_deck.get(0).remove(0);
+
             player_hand.add(card);
             player_points = BlackJack.getCardValueConform(player_hand);
             if (player_points >= 21) {
@@ -232,6 +234,7 @@ public class App {
                 pioched_deck = BlackJack.piocheDeck(deck);
             }
                 List<Integer> card = pioched_deck.get(0).remove(0);
+
                 dealer_hand.add(card);
                 dealer_points = BlackJack.getCardValueConform(dealer_hand);
                 System.out.println(dealer_points);
