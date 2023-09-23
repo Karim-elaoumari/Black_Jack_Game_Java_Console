@@ -96,5 +96,63 @@ public class BlackJack {
         defausse.addAll(deck);
         return defausse;
     }
+    public static int showChipSelectionDialog(int availableBalance) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        // Display available balance
+        JLabel balanceLabel = new JLabel("Available Balance: $" + String.valueOf(availableBalance));
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;
+        panel.add(balanceLabel, constraints);
+
+        String[] chipOptions = getAvailableChipOptions(availableBalance); // Get chip options based on available balance
+
+        JLabel label = new JLabel("Select a chip denomination:");
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 2;
+        panel.add(label, constraints);
+
+        JComboBox<String> chipComboBox = new JComboBox<>(chipOptions);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 2;
+        panel.add(chipComboBox, constraints);
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Chip Selection", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String selectedChip = (String) chipComboBox.getSelectedItem();
+            selectedChip = selectedChip.replace("$", "");
+            int chipValue = Integer.parseInt(selectedChip);
+            return chipValue;
+        } else {
+            // User canceled, return a default chip value (e.g., $1)
+            return 1;
+        }
+    }
+
+    private static String[] getAvailableChipOptions(int availableBalance) {
+        // Define your chip denominations based on the available balance
+        String[] chipOptions;
+        if (availableBalance >= 1000) {
+            chipOptions = new String[]{"$10","$50","$100", "$200", "$500", "$1000"};
+        } else if (availableBalance >= 500) {
+            chipOptions = new String[]{"$10","$50","$100", "$200", "$500"};
+        } else if (availableBalance >= 200) {
+            chipOptions = new String[]{"$10","$50","$100", "$200"};
+        } else if (availableBalance >= 100) {
+            chipOptions = new String[]{"$10","$50","$100"};
+        }  else if (availableBalance >= 50) {
+        chipOptions = new String[]{"$10","$50"};
+        } else {
+            chipOptions = new String[]{"$10"};
+        }
+        return chipOptions;
+    }
+
 
 }

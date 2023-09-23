@@ -17,8 +17,8 @@ public class App {
     public static List<List<List<Integer>>> pioched_deck =new ArrayList<>();
     public static Integer dealer_points = 0;
     public static Integer player_points = 0;
-    public static Integer player_score = 0;
-    public static Integer dealer_score = 0;
+    public static  Integer player_mony = 1000;
+    public static Integer selectedChipValue = 0;
     public static Integer round = 1;
     public static Integer round_status = 0;
     public static List<List<Integer>> dealer_hand = new ArrayList<>();
@@ -44,7 +44,6 @@ public class App {
                                 g.setFont(new Font("TimesRoman", Font.HANGING_BASELINE, 30));
                                 g.drawString("Wecome To Black Jack", 340, 260);
                                 g.drawString(" Start The Game", 365, 300);
-
                             }else{
                                 for (int i = 0; i < dealer_hand.size(); i++) {
                                     List<Integer> card = dealer_hand.get(i);
@@ -65,7 +64,6 @@ public class App {
                                 if (!stayButton.isEnabled()) {
                                     round_status = getRoundStatusAfterStand();
                                 }
-                                changeScore();
                                 g.setColor(Color.WHITE);
                                 g.setFont(new Font("TimesRoman", Font.HANGING_BASELINE, 17));
                                 g.drawString("Pioche:" +pioched_deck.get(0).size(), 800, 60);
@@ -73,8 +71,6 @@ public class App {
                                 g.drawImage(new ImageIcon(getClass().getResource("cards/BACK.png")).getImage(), 823, 100, 60, 84, null);
                                 g.drawImage(new ImageIcon(getClass().getResource("cards/BACK.png")).getImage(), 820, 100, 60, 84, null);
 
-                                g.drawString("Round: "+round , 800, 450);
-                                g.drawString("Dealer Score: "+dealer_score +" | "+"Player Score: "+player_score, 720, 500);
 
                                 if(round_status != 0 ){
                                     g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 20));
@@ -82,40 +78,29 @@ public class App {
                                         g.setColor(Color.RED);g.drawString("Dealer Win", 410, 220);
                                     }else if(round_status == 2){
                                         g.setColor(Color.green);g.drawString("You Win", 410, 220);
+                                        player_mony+=selectedChipValue*2;
                                     }else if(round_status == 3){
                                         g.setColor(Color.orange);g.drawString("Draw", 410, 220);
+                                        player_mony+=selectedChipValue;
                                     }
-                                    g.setFont(new Font("Arial", Font.PLAIN, 20));
-                                    g.setColor(Color.white);
-                                    g.drawString("Dealer Points:"+dealer_points+" | "+"Player Points:"+player_points, 340, 250);
-
                                     buttonPanel.remove(hitButton);buttonPanel.remove(stayButton);
-                                    if(pioched_deck.get(0).size() > 3){buttonPanel.add(newRoundButton);
+                                    if(player_mony>=10){buttonPanel.add(newRoundButton);
                                     }else{
                                         buttonPanel.add(startButton);buttonPanel.add(exitButton);
                                         deck = BlackJack.defausserCards(remaining_cards,deck);
-                                        g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 20));
-                                        g.setColor(Color.RED);
-                                        g.drawString("No more cards", 400, 200);
+                                        g.setFont(new Font("Arial", Font.BOLD, 20));
+                                        g.setColor(Color.ORANGE);
+                                        g.drawString("No more Balance", 400, 200);
                                     }
                                     buttonPanel.revalidate();
                                     buttonPanel.repaint();
                                     round_status = 0;
-                                }else{
-                                    if(pioched_deck.get(0).size() == 0){
-                                        g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 20));
-                                        g.setColor(Color.RED);
-                                        g.drawString("No more cards", 400, 220);
-                                        buttonPanel.remove(hitButton);buttonPanel.remove(stayButton);
-                                        buttonPanel.add(startButton);
-                                        deck = BlackJack.defausserCards(remaining_cards,deck);
-                                        buttonPanel.revalidate();
-                                        buttonPanel.repaint();
-                                    }
-                                        g.setFont(new Font("Arial", Font.PLAIN, 20));
-                                        g.setColor(Color.white);
-                                        g.drawString("Dealer Points: "+dealer_points, 400, 230);g.drawString("Your Points: "+player_points, 400, 260);
                                 }
+                                g.setFont(new Font("Arial", Font.PLAIN, 20));
+                                g.setColor(Color.white);
+                                g.drawString("Dealer Points:"+dealer_points+" | "+"Player Points:"+player_points, 340, 250);
+                                g.drawString("Round: "+round , 800, 450);
+                                g.drawString( "Your Balance: "+player_mony, 800, 500);
                             }
                         }
                     };
@@ -127,8 +112,6 @@ public class App {
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     gamePanel.setLayout(new BorderLayout());
                     gamePanel.setBackground(new Color(53, 101, 77));
-                    frame.add(gamePanel);
-
                     hitButton.setFocusable(false);
                     stayButton.setFocusable(false);
                     startButton.setFocusable(false);
@@ -139,6 +122,10 @@ public class App {
                     frame.add(gamePanel, BorderLayout.CENTER);
                     startButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
+                            player_mony = 1000;
+                            selectedChipValue = BlackJack.showChipSelectionDialog(player_mony);
+                            player_mony -= selectedChipValue;
+                            frame.setVisible(true);
                             round = 1;
                             deck = BlackJack.shuffleCards(deck);
                             pioched_deck = BlackJack.piocheDeck(deck);
@@ -152,8 +139,8 @@ public class App {
                     });
                     newRoundButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            remaining_cards.addAll(dealer_hand);
-                            remaining_cards.addAll(player_hand);
+                            selectedChipValue = BlackJack.showChipSelectionDialog(player_mony);
+                            player_mony -= selectedChipValue;
                             round++;
                             givePlayersStartingCards();
                             buttonPanel.remove(newRoundButton);
@@ -177,13 +164,6 @@ public class App {
                         public void actionPerformed(ActionEvent e) {giveDealerCards(gamePanel, hitButton, stayButton);}
                     });
     }
-    public static void changeScore(){
-        if(round_status == 1){
-            dealer_score++;
-        }else if(round_status == 2){
-            player_score++;
-        }
-    }
     public static Integer getRoundStatusAfterStand(){
         if(dealer_points > 21){
             round_status= 2;
@@ -205,15 +185,22 @@ public class App {
         round_status = 0;
         dealer_points = 0;
         player_points = 0;
+        remaining_cards.addAll(dealer_hand);
+        remaining_cards.addAll(player_hand);
         dealer_hand = new ArrayList<>();
         player_hand = new ArrayList<>();
+        if(pioched_deck.get(0).size() == 0){
+            deck = BlackJack.defausserCards(remaining_cards,deck);
+            pioched_deck = BlackJack.piocheDeck(deck);
+        }
         List<Integer> card = pioched_deck.get(0).remove(0);
-        dealer_points = BlackJack.getCardValueConform(dealer_hand);
         dealer_hand.add(card);
+        dealer_points = BlackJack.getCardValueConform(dealer_hand);
         for(int i = 0; i < 2; i++){
             card = pioched_deck.get(0).remove(0);
-            player_points = BlackJack.getCardValueConform(player_hand);
             player_hand.add(card);
+            player_points = BlackJack.getCardValueConform(player_hand);
+
         }
     }
     public static void repaintPanels(JPanel gamePanel, JPanel buttonPanel){
@@ -223,15 +210,16 @@ public class App {
     }
     public static void givePlayerCard(JPanel gamePanel, JButton hitButton){
         if(pioched_deck.get(0).size() == 0){
-            hitButton.setEnabled(false);
-        }else{
+                deck = BlackJack.defausserCards(remaining_cards,deck);
+                pioched_deck = BlackJack.piocheDeck(deck);
+        }
             List<Integer> card = pioched_deck.get(0).remove(0);
-            player_points = BlackJack.getCardValueConform(player_hand);
             player_hand.add(card);
+            player_points = BlackJack.getCardValueConform(player_hand);
             if (player_points >= 21) {
                 hitButton.setEnabled(false);
             }
-        }
+
         gamePanel.repaint();
 
     }
@@ -239,17 +227,17 @@ public class App {
         hitButton.setEnabled(false);
         stayButton.setEnabled(false);
         while (dealer_points < 17) {
-            if(pioched_deck.get(0).size() == 0 || dealer_points > player_points){
-                gamePanel.repaint();
-                break;
-            } else{
+            if(pioched_deck.get(0).size() == 0){
+                deck = BlackJack.defausserCards(remaining_cards,deck);
+                pioched_deck = BlackJack.piocheDeck(deck);
+            }
                 List<Integer> card = pioched_deck.get(0).remove(0);
-                dealer_points = BlackJack.getCardValueConform(dealer_hand);
                 dealer_hand.add(card);
+                dealer_points = BlackJack.getCardValueConform(dealer_hand);
                 System.out.println(dealer_points);
                 System.out.println(dealer_hand);
                 gamePanel.repaint();
-            }
+
         }
 
     }
