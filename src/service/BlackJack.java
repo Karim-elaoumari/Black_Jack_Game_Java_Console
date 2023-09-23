@@ -9,27 +9,22 @@ import java.util.List;
 
 public class BlackJack {
     public static List<List<Integer>> createDeck(){
-        List<List<Integer>> deck = new ArrayList<>();
-        for (int i = 1; i <= 4; i++) {
-            for (int j = 1; j <= 13; j++) {
-                List<Integer> card = new ArrayList<>();
-                card.add(j);
-                card.add(i);
-                deck.add(card);
-            }
-        }
+        List<List<Integer>> deck = retrunDeckBasedOnCard(List.of(1,1));
         return deck;
     }
     public static List<List<Integer>> retrunDeckBasedOnCard(List<Integer> card){
+        if (card.size() != 2 || card.get(0) < 1 || card.get(0) > 13 || card.get(1) < 1 || card.get(1) > 4) {
+            throw new IllegalArgumentException("Invalid card input");
+        }
         List<List<Integer>> deck = new ArrayList<>();
-        for (int i = card.get(1); i <= card.get(1)+4; i++) {
-            int step = card.get(1) == i ? card.get(0) : 1;
-            for(int j=step; j<= 13;j++){
-                deck.add(new ArrayList<>(List.of(j,i)));
+
+        for (int suit = card.get(1); suit <= 4; suit++) {
+            int startRank = (suit == card.get(1)) ? card.get(0) : 1;
+            for (int rank = startRank; rank <= 13; rank++) {
+                deck.add(List.of(rank, suit));
             }
         }
         return deck;
-
     }
     public static HashMap<List<Integer>, List<List<Integer>>>  getIemeCard(List<List<Integer>> deck,Integer card_index){
         HashMap<List<Integer>, List<List<Integer>>> card_deck = new HashMap<>(Map.of(deck.remove((int)card_index), deck));
@@ -73,22 +68,27 @@ public class BlackJack {
         }
         return card_value;
     }
-    public static Integer getCardValueConform(List<Integer> card, Integer points){
-        Integer card_value = card.get(0);
-        if(card_value > 10){
-            card_value = 10;
-        }
-        else if(card_value == 1){
-            if( points + 11 <= 21){
-                card_value = 11;
-            }else{
-                card_value = 1;
+    public static Integer getCardValueConform(List<List<Integer>> cards){
+        Integer points = 0;
+        cards.sort(Comparator.comparingInt(o -> o.get(0)));
+        for(List<Integer> card : cards){
+            Integer card_value = card.get(0);
+            if(card_value > 10){
+                card_value = 10;
             }
+            else if(card_value == 1){
+                if( points + 11 <= 21){
+                    card_value = 11;
+                }else{
+                    card_value = 1;
+                }
+            }
+            else{
+                card_value = card.get(0);
+            }
+            points += card_value;
         }
-        else{
-            card_value = card.get(0);
-        }
-        return card_value;
+        return points;
     }
     public static List<List<Integer>> defausserCards(List<List<Integer>> remaining_cards,List<List<Integer>>  deck){
         List<List<Integer>> defausse = new ArrayList<>();

@@ -46,8 +46,6 @@ public class App {
                                 g.drawString(" Start The Game", 365, 300);
 
                             }else{
-
-
                                 for (int i = 0; i < dealer_hand.size(); i++) {
                                     List<Integer> card = dealer_hand.get(i);
                                     g.drawImage(new ImageIcon(getClass().getResource("cards/"+card.get(0)+"-"+card.get(1)+".png")).getImage(), 110 + 25 + (110 - 50)*i, 20, 110, 154, null);
@@ -210,11 +208,11 @@ public class App {
         dealer_hand = new ArrayList<>();
         player_hand = new ArrayList<>();
         List<Integer> card = pioched_deck.get(0).remove(0);
-        dealer_points += BlackJack.getCardValueConform(card, dealer_points);
+        dealer_points = BlackJack.getCardValueConform(dealer_hand);
         dealer_hand.add(card);
         for(int i = 0; i < 2; i++){
             card = pioched_deck.get(0).remove(0);
-            player_points += BlackJack.getCardValueConform(card, player_points);
+            player_points = BlackJack.getCardValueConform(player_hand);
             player_hand.add(card);
         }
     }
@@ -228,7 +226,7 @@ public class App {
             hitButton.setEnabled(false);
         }else{
             List<Integer> card = pioched_deck.get(0).remove(0);
-            player_points += BlackJack.getCardValueConform(card, player_points);
+            player_points = BlackJack.getCardValueConform(player_hand);
             player_hand.add(card);
             if (player_points >= 21) {
                 hitButton.setEnabled(false);
@@ -246,7 +244,7 @@ public class App {
                 break;
             } else{
                 List<Integer> card = pioched_deck.get(0).remove(0);
-                dealer_points += BlackJack.getCardValueConform(card, dealer_points);
+                dealer_points = BlackJack.getCardValueConform(dealer_hand);
                 dealer_hand.add(card);
                 System.out.println(dealer_points);
                 System.out.println(dealer_hand);
