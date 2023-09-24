@@ -53,24 +53,15 @@ public class BlackJack {
         pioche_deck.add(deck.subList(pioche_index, deck.size()));
         return pioche_deck;
     }
-    public static void drawCard(Graphics g, URL imagePath, int x, int y, int width, int height) {
-        try{
-            Image cardImg = new ImageIcon(imagePath).getImage();
-            g.drawImage(cardImg, x, y, width, height, null); // Adjust coordinates and dimensions as needed
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-    public static  Integer getCardValue(List<Integer> card){
-        Integer card_value = card.get(0);
-        if(card_value > 10){
-            card_value = 10;
-        }
-        return card_value;
-    }
+
     public static Integer getCardValueConform(List<List<Integer>> cards){
         Integer points = 0;
-        cards.sort(Comparator.comparingInt(o -> o.get(0)));
+
+        for(int i = 0; i < cards.size(); i++){
+            if(cards.get(i).get(0) == 1){
+                cards.add(cards.remove(i));
+            }
+        }
         for(List<Integer> card : cards){
             Integer card_value = card.get(0);
             if(card_value > 10){
@@ -96,7 +87,7 @@ public class BlackJack {
         defausse.addAll(deck);
         return defausse;
     }
-    public static int showChipSelectionDialog(int availableBalance) {
+    public static int showChipSelectionDialog(int availableBalance,int selectedChipp) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(10, 10, 10, 10);
@@ -108,7 +99,7 @@ public class BlackJack {
         constraints.gridwidth = 2;
         panel.add(balanceLabel, constraints);
 
-        String[] chipOptions = getAvailableChipOptions(availableBalance); // Get chip options based on available balance
+        String[] chipOptions =  getAvailableChipOptions(availableBalance,selectedChipp); // Get chip options based on available balance
 
         JLabel label = new JLabel("Select a chip denomination:");
         constraints.gridx = 0;
@@ -135,8 +126,8 @@ public class BlackJack {
         }
     }
 
-    private static String[] getAvailableChipOptions(int availableBalance) {
-        // Define your chip denominations based on the available balance
+    private static String[] getAvailableChipOptions(int availableBalance,int selectedChip) {
+
         String[] chipOptions;
         if (availableBalance >= 1000) {
             chipOptions = new String[]{"$10","$50","$100", "$200", "$500", "$1000"};
@@ -150,6 +141,16 @@ public class BlackJack {
         chipOptions = new String[]{"$10","$50"};
         } else {
             chipOptions = new String[]{"$10"};
+        }
+        if(availableBalance>=selectedChip) {
+            for (int i = 0; i < chipOptions.length; i++) {
+                if (chipOptions[i].equals("$" + selectedChip)) {
+                    String temp = chipOptions[0];
+                    chipOptions[0] = chipOptions[i];
+                    chipOptions[i] = temp;
+                    break;
+                }
+            }
         }
         return chipOptions;
     }

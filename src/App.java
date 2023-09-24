@@ -4,11 +4,10 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
+import java.util.TimerTask;
+import java.util.Timer;
 
 
 public class App {
@@ -44,6 +43,8 @@ public class App {
                                 g.drawString("Wecome To Black Jack", 340, 260);
                                 g.drawString(" Start The Game", 365, 300);
                             }else{
+//                                draw chip between the player and the dealer in the left side
+
                                 for (int i = 0; i < dealer_hand.size(); i++) {
                                     List<Integer> card = dealer_hand.get(i);
                                     g.drawImage(new ImageIcon(getClass().getResource("cards/"+card.get(0)+"-"+card.get(1)+".png")).getImage(), 110 + 25 + (110 - 50)*i, 20, 110, 154, null);
@@ -75,12 +76,27 @@ public class App {
                                     g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 20));
                                     if(round_status == 1){
                                         g.setColor(Color.RED);g.drawString("Dealer Win", 410, 220);
+                                        g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 10, 160, 120, 120, null);
+                                        g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 6, 170, 120, 120, null);
+                                        g.setColor(Color.WHITE);
+                                        g.setFont(new Font("TimesRoman", Font.HANGING_BASELINE, 17));
+                                        g.drawString(selectedChipValue.toString(), 44, 235);
                                     }else if(round_status == 2){
                                         g.setColor(Color.green);g.drawString("You Win", 410, 220);
+                                        g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 10, 280, 120, 120, null);
+                                        g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 6, 290, 120, 120, null);
+                                        g.setColor(Color.WHITE);
+                                        g.setFont(new Font("TimesRoman", Font.HANGING_BASELINE, 17));
+                                        g.drawString(selectedChipValue.toString(), 44, 355);
                                         player_mony+=selectedChipValue*2;
                                     }else if(round_status == 3){
                                         g.setColor(Color.orange);g.drawString("Draw", 410, 220);
-                                        player_mony+=selectedChipValue;
+                                        g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 10, 160, 120, 120, null);
+                                        g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 10, 280, 120, 120, null);
+                                        g.setColor(Color.WHITE);
+                                        g.setFont(new Font("TimesRoman", Font.HANGING_BASELINE, 17));
+                                        g.drawString(selectedChipValue.toString(), 50, 225);
+                                        g.drawString(selectedChipValue.toString(), 50, 345);
                                     }
                                     buttonPanel.remove(hitButton);buttonPanel.remove(stayButton);
                                     if(player_mony>=10){buttonPanel.add(newRoundButton);
@@ -94,6 +110,14 @@ public class App {
                                     buttonPanel.revalidate();
                                     buttonPanel.repaint();
                                     round_status = 0;
+                                }else {
+                                    g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 10, 160, 120, 120, null);
+                                    g.drawImage(new ImageIcon(getClass().getResource("cards/chip.png")).getImage(), 10, 280, 120, 120, null);
+//                                draw chip value in side the two images
+                                    g.setColor(Color.WHITE);
+                                    g.setFont(new Font("TimesRoman", Font.HANGING_BASELINE, 17));
+                                    g.drawString(selectedChipValue.toString(), 50, 225);
+                                    g.drawString(selectedChipValue.toString(), 50, 345);
                                 }
                                 g.setFont(new Font("Arial", Font.PLAIN, 20));
                                 g.setColor(Color.white);
@@ -122,7 +146,7 @@ public class App {
                     startButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
                             player_mony = 1000;
-                            selectedChipValue = BlackJack.showChipSelectionDialog(player_mony);
+                            selectedChipValue = BlackJack.showChipSelectionDialog(player_mony,selectedChipValue);
                             player_mony -= selectedChipValue;
                             frame.setVisible(true);
                             round = 1;
@@ -138,7 +162,7 @@ public class App {
                     });
                     newRoundButton.addActionListener(new ActionListener() {
                         public void actionPerformed(ActionEvent e) {
-                            selectedChipValue = BlackJack.showChipSelectionDialog(player_mony);
+                            selectedChipValue = BlackJack.showChipSelectionDialog(player_mony,selectedChipValue);
                             player_mony -= selectedChipValue;
                             round++;
                             givePlayersStartingCards();
@@ -188,12 +212,12 @@ public class App {
         remaining_cards.addAll(player_hand);
         dealer_hand = new ArrayList<>();
         player_hand = new ArrayList<>();
-        if(pioched_deck.get(0).size() == 0){
+        if(pioched_deck.get(0).size() < 3){
             deck = BlackJack.defausserCards(remaining_cards,deck);
             pioched_deck = BlackJack.piocheDeck(deck);
         }
+        System.out.println(pioched_deck.get(0).size());
         List<Integer> card = pioched_deck.get(0).remove(0);
-
         dealer_hand.add(card);
         dealer_points = BlackJack.getCardValueConform(dealer_hand);
         for(int i = 0; i < 2; i++){
@@ -234,11 +258,8 @@ public class App {
                 pioched_deck = BlackJack.piocheDeck(deck);
             }
                 List<Integer> card = pioched_deck.get(0).remove(0);
-
                 dealer_hand.add(card);
                 dealer_points = BlackJack.getCardValueConform(dealer_hand);
-                System.out.println(dealer_points);
-                System.out.println(dealer_hand);
                 gamePanel.repaint();
 
         }
