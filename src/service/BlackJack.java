@@ -121,11 +121,9 @@ public class BlackJack {
             int chipValue = Integer.parseInt(selectedChip);
             return chipValue;
         } else {
-            // User canceled, return a default chip value (e.g., $1)
-            return 1;
+            return 10;
         }
     }
-
     private static String[] getAvailableChipOptions(int availableBalance,int selectedChip) {
 
         String[] chipOptions;
@@ -154,6 +152,20 @@ public class BlackJack {
         }
         return chipOptions;
     }
-
+    public static Integer getRoundStatusAfterStand(Integer dealer_points, Integer player_points, Integer round_status){
+        if(dealer_points > 21){
+            round_status= 2;
+        }
+        else if(dealer_points == 21){
+            round_status= 1;
+        }else if(player_points == dealer_points){
+            round_status= 3;
+        }else if(player_points > dealer_points){
+            round_status= 2;
+        }else if(player_points < dealer_points){
+            round_status= 1;
+        }
+        return round_status;
+    }
 
 }
