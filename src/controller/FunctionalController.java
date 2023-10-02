@@ -51,17 +51,31 @@ public class FunctionalController {
                     gamePanelService.paintStartGame(g);
                 }else{
                     gamePanelService.paintCards(g,player_hand,dealer_hand,stayButton);
-                    if(player_points > 21){round_status= 1;} else if (player_points == 21) {round_status= 2;}
+                    if(player_points > 21) {
+                        round_status = 1;
+                    }
+//                    } else if (player_points == 21  && !stayButton.isEnabled()) {
+//                        round_status = 2;
+//                    } else if (player_points == 21 ) {
+//                        System.out.println("player_points == 21");
+//                        stayButton.doClick();
+//                    }
                     if (!stayButton.isEnabled()) {
                         round_status = BlackJack.getRoundStatusAfterStand(dealer_points, player_points,round_status);
                     }
                     gamePanelService.paintPioche(g,pioched_deck.get(0).size());
                     if(round_status != 0 ){
-                        gamePanelService.paintRoundResult(g,round_status,selectedChipValue,player_mony);
+                        gamePanelService.paintRoundResult(g,round_status,selectedChipValue);
                         buttonPanel.remove(hitButton);buttonPanel.remove(stayButton);
                         buttonPanel.revalidate();
                         buttonPanel.repaint();
+                        if(round_status ==  3){
+                            player_mony += selectedChipValue;
+                        }else if(round_status == 2){
+                            player_mony += selectedChipValue*2;
+                        }
                         round_status = 0;
+
                         if(player_mony>=10){buttonPanel.add(newRoundButton);
                         }else{
                             buttonPanel.add(startButton);buttonPanel.add(exitButton);
@@ -146,11 +160,12 @@ public class FunctionalController {
     }
     public static void hundleStartPress(JPanel gamePanel, JPanel buttonPanel, JButton hitButton, JButton stayButton,JButton startButton, JButton exitButton, JFrame frame){
         player_mony = 1000;
-        selectedChipValue = BlackJack.showChipSelectionDialog(player_mony,selectedChipValue);
+        selectedChipValue = gamePanelService.showChipSelectionDialog(player_mony,selectedChipValue);
         player_mony -= selectedChipValue;
         frame.setVisible(true);
         round = 1;
         deck = BlackJack.shuffleCards(deck);
+        System.out.println(deck.size());
         pioched_deck = BlackJack.piocheDeck(deck);
         givePlayersStartingCards();
         buttonPanel.remove(startButton);
@@ -161,7 +176,7 @@ public class FunctionalController {
 
     }
     public static void hudleNewRoundPress(JPanel gamePanel, JPanel buttonPanel, JButton hitButton, JButton stayButton, JButton newRoundButton){
-        selectedChipValue = BlackJack.showChipSelectionDialog(player_mony,selectedChipValue);
+        selectedChipValue = gamePanelService.showChipSelectionDialog(player_mony,selectedChipValue);
         player_mony -= selectedChipValue;
         round++;
         givePlayersStartingCards();

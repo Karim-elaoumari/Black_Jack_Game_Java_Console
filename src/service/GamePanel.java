@@ -38,7 +38,7 @@ public class GamePanel {
         g.drawImage(new ImageIcon(getClass().getResource("../cards/BACK.png")).getImage(), 820, 100, 60, 84, null);
 
     }
-    public void paintRoundResult(Graphics g,Integer round_status, Integer selectedChipValue, Integer player_mony){
+    public void paintRoundResult(Graphics g,Integer round_status, Integer selectedChipValue){
         g.setFont(new Font("Arial", Font.ROMAN_BASELINE, 30));
         if(round_status == 1){
             g.setColor(Color.RED);g.drawString("Dealer Win", 410, 260);
@@ -48,7 +48,6 @@ public class GamePanel {
             g.setColor(Color.green);g.drawString("You Win", 410, 260);
             this.paintChips(g, 2, selectedChipValue);
 
-            player_mony+=selectedChipValue*2;
         }else if(round_status == 3){
             g.setColor(Color.orange);g.drawString("Draw", 410, 250);
             this.paintChips(g, 3, selectedChipValue);
@@ -88,6 +87,71 @@ public class GamePanel {
         g.drawString("Round: "+round , 800, 450);
         g.drawString( "Your Balance: "+player_mony, 800, 500);
 
+    }
+    public  int showChipSelectionDialog(int availableBalance,int selectedChipp) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.insets = new Insets(10, 10, 10, 10);
+
+        // Display available balance
+        JLabel balanceLabel = new JLabel("Available Balance: $" + String.valueOf(availableBalance));
+        constraints.gridx = 0;
+        constraints.gridy = 0;
+        constraints.gridwidth = 2;
+        panel.add(balanceLabel, constraints);
+
+        String[] chipOptions =  getAvailableChipOptions(availableBalance,selectedChipp); // Get chip options based on available balance
+
+        JLabel label = new JLabel("Select a chip denomination:");
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.gridwidth = 2;
+        panel.add(label, constraints);
+
+        JComboBox<String> chipComboBox = new JComboBox<>(chipOptions);
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.gridwidth = 2;
+        panel.add(chipComboBox, constraints);
+
+        int result = JOptionPane.showConfirmDialog(null, panel, "Chip Selection", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            String selectedChip = (String) chipComboBox.getSelectedItem();
+            selectedChip = selectedChip.replace("$", "");
+            int chipValue = Integer.parseInt(selectedChip);
+            return chipValue;
+        } else {
+            return 10;
+        }
+    }
+    private  String[] getAvailableChipOptions(int availableBalance,int selectedChip) {
+
+        String[] chipOptions;
+        if (availableBalance >= 1000) {
+            chipOptions = new String[]{"$10","$50","$100", "$200", "$500", "$1000"};
+        } else if (availableBalance >= 500) {
+            chipOptions = new String[]{"$10","$50","$100", "$200", "$500"};
+        } else if (availableBalance >= 200) {
+            chipOptions = new String[]{"$10","$50","$100", "$200"};
+        } else if (availableBalance >= 100) {
+            chipOptions = new String[]{"$10","$50","$100"};
+        }  else if (availableBalance >= 50) {
+            chipOptions = new String[]{"$10","$50"};
+        } else {
+            chipOptions = new String[]{"$10"};
+        }
+        if(availableBalance>=selectedChip) {
+            for (int i = 0; i < chipOptions.length; i++) {
+                if (chipOptions[i].equals("$" + selectedChip)) {
+                    String temp = chipOptions[0];
+                    chipOptions[0] = chipOptions[i];
+                    chipOptions[i] = temp;
+                    break;
+                }
+            }
+        }
+        return chipOptions;
     }
 
 }

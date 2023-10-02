@@ -17,7 +17,6 @@ public class BlackJack {
             throw new IllegalArgumentException("Invalid card input");
         }
         List<List<Integer>> deck = new ArrayList<>();
-
         for (int suit = card.get(1); suit <= 4; suit++) {
             int startRank = (suit == card.get(1)) ? card.get(0) : 1;
             for (int rank = startRank; rank <= 13; rank++) {
@@ -26,22 +25,16 @@ public class BlackJack {
         }
         return deck;
     }
-    public static HashMap<List<Integer>, List<List<Integer>>>  getIemeCard(List<List<Integer>> deck,Integer card_index){
-        HashMap<List<Integer>, List<List<Integer>>> card_deck = new HashMap<>(Map.of(deck.remove((int)card_index), deck));
-        return card_deck;
+    public static List<Integer>  getIemeCard(List<List<Integer>> deck,Integer card_index){
+        return deck.remove((int)card_index);
     }
-    public static HashMap<List<Integer>, List<List<Integer>>>  getRandCard(List<List<Integer>> deck){
+    public static List<Integer>   getRandCard(List<List<Integer>> deck){
         int card_index = (int) (Math.random() * deck.size());
         return getIemeCard(deck, card_index);
     }
     public static List<List<Integer>> shuffleCards(List<List<Integer>> deck){
-//        List<List<Integer>> shuffled_deck = deck;
-        for(int i = 0; i < deck.size(); i++){
-            HashMap<List<Integer>, List<List<Integer>>> card_deck = getRandCard(deck);
-            List<Integer> card = new ArrayList<>(card_deck.keySet()).get(0);
-            deck = new ArrayList<>();
-            deck.add(card);
-            deck.addAll(card_deck.get(card));
+        for(int i = 0; i < deck.size()+20; i++){
+            deck.add(getRandCard(deck));
         }
         return deck;
     }
@@ -56,27 +49,18 @@ public class BlackJack {
 
     public static Integer getCardValueConform(List<List<Integer>> cards){
         Integer points = 0;
-
-        for(int i = 0; i < cards.size(); i++){
-            if(cards.get(i).get(0) == 1){
-                cards.add(cards.remove(i));
-            }
-        }
+        List<List<Integer>> cardsTemp = new ArrayList<>(cards);
+        cardsTemp.stream().forEach(card -> {
+            if(card.get(0) == 1) {cards.add(cards.remove(cards.indexOf(card)));}
+        });
         for(List<Integer> card : cards){
             Integer card_value = card.get(0);
-            if(card_value > 10){
-                card_value = 10;
-            }
+            if(card_value > 10){card_value = 10;}
             else if(card_value == 1){
-                if( points + 11 <= 21){
-                    card_value = 11;
-                }else{
-                    card_value = 1;
-                }
+                if( points + 11 <= 21){card_value = 11;}
+                else{card_value = 1;}
             }
-            else{
-                card_value = card.get(0);
-            }
+            else{card_value = card.get(0);}
             points += card_value;
         }
         return points;
@@ -86,71 +70,6 @@ public class BlackJack {
         defausse.addAll(remaining_cards);
         defausse.addAll(deck);
         return defausse;
-    }
-    public static int showChipSelectionDialog(int availableBalance,int selectedChipp) {
-        JPanel panel = new JPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.insets = new Insets(10, 10, 10, 10);
-
-        // Display available balance
-        JLabel balanceLabel = new JLabel("Available Balance: $" + String.valueOf(availableBalance));
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        panel.add(balanceLabel, constraints);
-
-        String[] chipOptions =  getAvailableChipOptions(availableBalance,selectedChipp); // Get chip options based on available balance
-
-        JLabel label = new JLabel("Select a chip denomination:");
-        constraints.gridx = 0;
-        constraints.gridy = 1;
-        constraints.gridwidth = 2;
-        panel.add(label, constraints);
-
-        JComboBox<String> chipComboBox = new JComboBox<>(chipOptions);
-        constraints.gridx = 0;
-        constraints.gridy = 2;
-        constraints.gridwidth = 2;
-        panel.add(chipComboBox, constraints);
-
-        int result = JOptionPane.showConfirmDialog(null, panel, "Chip Selection", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
-
-        if (result == JOptionPane.OK_OPTION) {
-            String selectedChip = (String) chipComboBox.getSelectedItem();
-            selectedChip = selectedChip.replace("$", "");
-            int chipValue = Integer.parseInt(selectedChip);
-            return chipValue;
-        } else {
-            return 10;
-        }
-    }
-    private static String[] getAvailableChipOptions(int availableBalance,int selectedChip) {
-
-        String[] chipOptions;
-        if (availableBalance >= 1000) {
-            chipOptions = new String[]{"$10","$50","$100", "$200", "$500", "$1000"};
-        } else if (availableBalance >= 500) {
-            chipOptions = new String[]{"$10","$50","$100", "$200", "$500"};
-        } else if (availableBalance >= 200) {
-            chipOptions = new String[]{"$10","$50","$100", "$200"};
-        } else if (availableBalance >= 100) {
-            chipOptions = new String[]{"$10","$50","$100"};
-        }  else if (availableBalance >= 50) {
-        chipOptions = new String[]{"$10","$50"};
-        } else {
-            chipOptions = new String[]{"$10"};
-        }
-        if(availableBalance>=selectedChip) {
-            for (int i = 0; i < chipOptions.length; i++) {
-                if (chipOptions[i].equals("$" + selectedChip)) {
-                    String temp = chipOptions[0];
-                    chipOptions[0] = chipOptions[i];
-                    chipOptions[i] = temp;
-                    break;
-                }
-            }
-        }
-        return chipOptions;
     }
     public static Integer getRoundStatusAfterStand(Integer dealer_points, Integer player_points, Integer round_status){
         if(dealer_points > 21){
